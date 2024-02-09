@@ -5,9 +5,18 @@ namespace WebApp;
 use WebApp\Http\Requests\Request;
 use WebApp\Http\Responses\Response;
 
+/**
+ * Class Router
+ */
 class Router
 {
+    /**
+     * @var Request
+     */
     public Request $request;
+    /**
+     * @var Response
+     */
     public Response $response;
 
     /**
@@ -15,17 +24,29 @@ class Router
      */
     protected array $routes = [];
 
-    public function __construct(Request $request,  Response $response)
+    /**
+     * @param Request $request
+     * @param Response $response
+     */
+    public function __construct(Request $request, Response $response)
     {
         $this->request = $request;
         $this->response = $response;
     }
 
-    public function post(string $path, array $callback)
+    /**
+     * @param string $path
+     * @param array $callback
+     * @return void
+     */
+    public function post(string $path, array $callback): void
     {
         $this->routes['post'][$path] = $callback;
     }
 
+    /**
+     * @return array|mixed
+     */
     public function resolve()
     {
         $path = $this->request->getPath(); // URI - e.g., /product/12
@@ -61,7 +82,11 @@ class Router
         return $this->routes[$method][$path] ?? false;
     }
 
-    private function functionExists($callback): bool
+    /**
+     * @param array $callback
+     * @return bool
+     */
+    private function functionExists(array $callback): bool
     {
         return method_exists($callback[0], $callback[1]);
     }

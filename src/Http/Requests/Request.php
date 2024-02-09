@@ -2,8 +2,14 @@
 
 namespace WebApp\Http\Requests;
 
+/**
+ * Class Request
+ */
 class Request
 {
+    /**
+     * @return string
+     */
     public function getPath(): string
     {
         $path = $_SERVER['REQUEST_URI'] ?? '/';
