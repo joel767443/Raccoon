@@ -19,7 +19,7 @@ const router = createRouter({
     },
     {
       path: '/add-item',
-      name: 'add-item',
+      name: 'addItem',
       component: CreateView
     },
     {
