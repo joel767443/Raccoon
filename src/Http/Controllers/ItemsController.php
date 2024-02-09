@@ -60,8 +60,7 @@ class ItemsController
      */
     public function update(Request $request): array
     {
-        $item = Item::find( $request['id']);
-        $item->loadData($request->getBody());
+        $item = Item::update($request->getBody());
 
         if ($item->validate() && $item->update()) {
             return $this->response->jsonResponse("Item updated", 200, $request->getBody());
