@@ -12,7 +12,7 @@
 
     <table class="table table-bordered table-hover">
       <thead>
-      <tr>
+      <tr>vue plugin chrome
         <th>ID</th>
         <th>Name</th>
         <th>Description</th>
@@ -33,7 +33,7 @@
         <td>
           <RouterLink class="btn btn-sm btn-success" :to="'items/' + item.id + '/edit'">Edit</RouterLink>
           &nbsp;
-          <button class="btn btn-sm btn-danger" type="button">Delete</button>
+          <button class="btn btn-sm btn-danger" @click="deleteItem(item.id)" type="button">Delete</button>
         </td>
       </tr>
       </tbody>
@@ -63,6 +63,19 @@ export default {
         this.items = res.data.data
         console.log(res.data)
       });
+    },
+    deleteItem(itemId) {
+      const apiUrl = 'http://localhost:8001/api/items/' + itemId + '/delete';
+
+      // Make a DELETE request using Axios
+      axios.delete(apiUrl)
+          .then(response => {
+            console.log('Item deleted successfully', response);
+          })
+          .catch(error => {
+            // Handle error, e.g., show an error message
+            console.error('Error deleting item', error);
+          });
     }
   }
 }
