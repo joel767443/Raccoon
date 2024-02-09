@@ -2,7 +2,9 @@
 
 namespace WebApp\Http\Controllers;
 
+use WebApp\Http\Requests\Request;
 use WebApp\Http\Responses\Response;
+use WebApp\Models\Item;
 
 /**
  * Class ItemsController
@@ -37,21 +39,35 @@ class ItemsController
     }
 
     /**
+     * @param Request $request
      * @return array
      */
-    public function create(): array
+    public function create(Request $request): array
     {
-        $item = [];
-        return $this->response->jsonResponse("Item created.", 200, $item);
+        $item = new Item();
+        $item->loadData($request->getBody());
+
+        if ($item->validate() && $item->create()) {
+            return $this->response->jsonResponse("Item updated", 200, $request->getBody());
+        }
+
+        return $this->response->jsonResponse("Could not update data", 500, $item->errors, false);
     }
 
     /**
+     * @param Request $request
      * @return array
      */
-    public function update(): array
+    public function update(Request $request): array
     {
-        $item = [];
-        return $this->response->jsonResponse("Item updated.", 200, $item);
+        $item = Item::find( $request['id']);
+        $item->loadData($request->getBody());
+
+        if ($item->validate() && $item->update()) {
+            return $this->response->jsonResponse("Item updated", 200, $request->getBody());
+        }
+
+        return $this->response->jsonResponse("Could not update data", 500, $item->errors, false);
     }
 
     /**

@@ -11,6 +11,33 @@ class Item extends Model
     public $price;
     public $availability;
 
+    public static function find(int $id): ?Item
+    {
+        $dbCon = "not done yet";
+        $db = $dbCon;
+
+        $stmt = $db->prepare("SELECT * FROM items WHERE id = :id");
+        $stmt->bindParam(':id', $id, \PDO::PARAM_INT);
+        $stmt->execute();
+
+        $data = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+        if (!$data) {
+            return null;
+        }
+
+        $item = new Item();
+        $item->name = $data['name'];
+        $item->description = $data['description'];
+        $item->brand = $data['brand'];
+        $item->color = $data['color'];
+        $item->checked = $data['checked'];
+        $item->price = $data['price'];
+        $item->availability = $data['availability'];
+
+        return $item;
+    }
+
     public function rules(): array
     {
         return [
