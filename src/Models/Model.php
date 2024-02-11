@@ -2,14 +2,38 @@
 
 namespace WebApp\Models;
 
+use WebApp\Database\Database;
+
+/**
+ *
+ */
 abstract class Model
 {
+    /**
+     * @var array
+     */
     public array $errors = [];
+    /**
+     *
+     */
     public const RULE_REQUIRED = 'required';
+    /**
+     *
+     */
     public const IS_INT = 'is int';
+    /**
+     *
+     */
     public const IS_FLOAT = 'is float';
+    /**
+     *
+     */
     public const IS_STRING = 'is string';
 
+    /**
+     * @param $data
+     * @return void
+     */
     public function loadData($data)
     {
         foreach ($data as $property => $value) {
@@ -19,8 +43,14 @@ abstract class Model
         }
     }
 
+    /**
+     * @return array
+     */
     abstract public function rules(): array;
 
+    /**
+     * @return bool
+     */
     public function validate(): bool
     {
         foreach ($this->rules() as $attribute => $rules) {
@@ -54,11 +84,24 @@ abstract class Model
         return empty($this->errors);
     }
 
+    /**
+     * @return true
+     */
     public function create()
     {
-
+        $db = new Database();
+        $values = (array)$this;
+        unset($values["errors"]);
+        $db->create('items', $values);
+        $db->close();
+        return true;
     }
 
+    /**
+     * @param string $attribute
+     * @param string $rule
+     * @return void
+     */
     private function addError(string $attribute, string $rule)
     {
         $message = $this->errorMessages()[$rule] ?? '';
@@ -66,6 +109,9 @@ abstract class Model
         $this->errors[$attribute][] = $message;
     }
 
+    /**
+     * @return string[]
+     */
     public function errorMessages(): array
     {
         return [

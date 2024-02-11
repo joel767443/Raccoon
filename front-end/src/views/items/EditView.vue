@@ -3,10 +3,15 @@
     <div class="card-header">
       <h4>
         Edit Item
-        <router-link to="/items" class="btn float-end btn-success">Back</router-link>
+        <router-link to="/" class="btn float-end btn-success">Back</router-link>
       </h4>
     </div>
     <div class="card-body">
+      <div v-if="errorList" class="text-danger">
+        <ul>
+          <li v-for="(error, field) in errorList" :key="field">{{ error[0] }}</li>
+        </ul>
+      </div>
       <div class="mb-3">
         <label for="name">Name</label>
         <input type="text" class="form-control" v-model="model.item.name"/>
@@ -25,7 +30,8 @@
       </div>
       <div class="mb-3">
         <label for="checked">Checked</label>
-        <input type="text" class="form-control" v-model="model.item.checked"/>
+        <input type="checkbox" class="form-check-input" v-model="model.item.checked"/>
+        <input type="hidden" :value="model.item.checked ? '1' : '0'" name="checked" />
       </div>
       <div class="mb-3">
         <label for="availability">Availability</label>
@@ -44,6 +50,7 @@
 
 <script>
 import axios from "axios";
+import config from "../../config.js";
 
 export default {
   name: 'itemEdit',
@@ -63,24 +70,32 @@ export default {
       }
     }
   },
+  watch: {
+    '$route.params.id': 'loadItemData'
+  },
+  created() {
+    this.loadItemData();
+  },
   methods: {
+    loadItemData() {
+      const itemId = this.$route.params.id;
+      if (itemId) {
+
+        axios.get(`${config.apiBaseUrl}/item?id=${itemId}`)
+            .then(response => {
+              console.log(response)
+              this.model.item = response.data;
+            })
+            .catch(error => {
+              console.error('Error loading item data:', error);
+            });
+      }
+    },
     saveItem() {
       const $this = this;
-      axios.post("http://localhost:8001/api/items/update", this.model.item)
+      axios.post(`${config.apiBaseUrl}/items/update`, this.model.item)
           .then(res => {
-            console.log(res);
             alert(res.data.message);
-
-            // Clear the form after successful save
-            this.model.item = {
-              name: '',
-              description: '',
-              brand: '',
-              color: '',
-              checked: '',
-              price: '',
-              availability: '',
-            };
           })
           .catch(function (error) {
             if (error.response.status === 422) {

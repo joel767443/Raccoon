@@ -1,6 +1,9 @@
 <?php
 
 namespace WebApp\Models;
+
+use WebApp\Database\Database;
+
 /**
  *
  */
@@ -37,18 +40,13 @@ class Item extends Model
 
     /**
      * @param int $id
-     * @return Item|null
+     * @return mixed|null
      */
-    public static function find(int $id): ?Item
+    public static function find(int $id)
     {
-        $dbCon = "not done yet";
-        $db = $dbCon;
-
-        $stmt = $db->prepare("SELECT * FROM items WHERE id = :id");
-        $stmt->bindParam(':id', $id, \PDO::PARAM_INT);
-        $stmt->execute();
-
-        $item = $stmt->fetch(\PDO::FETCH_ASSOC);
+        $db = new Database();
+        $stmt = $db->query("SELECT * FROM items WHERE id = :id", ['id' => $id]);
+        $item = $db->fetchAssoc($stmt);
 
         if (!$item) {
             return null;
@@ -59,47 +57,50 @@ class Item extends Model
 
     /**
      * @param array $data
-     * @return string|void
+     * @return bool
      */
-    public static function update(array $data)
+    public static function update(array $data): bool
     {
-        $dbCon = 'not yet';
-
         $item = Item::find($data['id']);
 
-        if ($item) {
-            $item->name = $data['name'];
-            $item->description = $data['description'];
-            $item->brand = $data['brand'];
-            $item->color = $data['color'];
-            $item->checked = $data['checked'];
-            $item->price = $data['price'];
-            $item->availability = $data['availability'];
-
-            // Perform the update
-            $stmt = $dbCon->prepare("UPDATE items SET 
-                name = :name,
-                description = :description,
-                brand = :brand,
-                color = :color,
-                checked = :checked,
-                price = :price,
-                availability = :availability
-                WHERE id = :id");
-
-            $stmt->bindParam(':id', $data['id'], \PDO::PARAM_INT);
-            $stmt->bindParam(':name', $item->name);
-            $stmt->bindParam(':description', $item->description);
-            $stmt->bindParam(':brand', $item->brand);
-            $stmt->bindParam(':color', $item->color);
-            $stmt->bindParam(':checked', $item->checked);
-            $stmt->bindParam(':price', $item->price);
-            $stmt->bindParam(':availability', $item->availability);
-
-            $stmt->execute();
-
-            return self::class;
+        if ($item == null) {
+            return false;
         }
+
+        $data = [
+            'id' => $data['id'],
+            'name' => $data['name'],
+            'description' => $data['description'],
+            'brand' => $data['brand'],
+            'color' => $data['color'],
+            'checked' => $data['checked'],
+            'price' => $data['price'],
+            'availability' => $data['availability'],
+        ];
+
+        $db = new Database();
+        $db->query("UPDATE items SET 
+                            name = :name,
+                            description = :description,
+                            brand = :brand,
+                            color = :color,
+                            checked = :checked,
+                            price = :price,
+                            availability = :availability
+                            WHERE id = :id", $data);
+
+        return true;
+    }
+
+    /**
+     * @param int $id
+     * @return true
+     */
+    public static function delete(int $id): bool
+    {
+        $db = new Database();
+        $db->query("DELETE FROM items where id = " . $id);
+        return true;
     }
 
     /**
@@ -108,11 +109,12 @@ class Item extends Model
     public function rules(): array
     {
         return [
-            'name' => [self::RULE_REQUIRED, self::IS_INT],
+            'name' => [self::RULE_REQUIRED, self::IS_STRING],
             'description' => [self::RULE_REQUIRED, self::IS_STRING],
             'brand' => [self::RULE_REQUIRED],
+            'color' => [self::RULE_REQUIRED],
             'price' => [self::RULE_REQUIRED],
-            'availability' => [self::RULE_REQUIRED, self::IS_INT],
+            'availability' => [self::RULE_REQUIRED],
         ];
     }
 }

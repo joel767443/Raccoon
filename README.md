@@ -1,13 +1,19 @@
-# racoon
+# Setup
 
-After cloning the project, you can run it by
+`git clone git@github.com:joel767443/Raccoon.git`
 
-`cd front-end`
+`cd Raccoon/front-end`
+
 `npm install`
+
 `npm run dev`
 
-open a new terminal tab
+Open a new tab and CD into the base folder "Raccoon"
 
-`cd ..` #go back to the base folder
+run `php -S localhost:8001`
 
-`php -S localhost:8001` to run the PHP server, this requires that you have at least php 7.4 installed, preferred version is 8
+create a database and items table using the script in `src/Database/main.sql`
+
+copy config.sample.php to config.php and set the database configuration.
+
+copy front-end/src/config.example.js to front-end/src/config.js and set `apiBaseUrl`

@@ -3,37 +3,30 @@
     <div class="card-header">
       <h4>
         Add Item
-        <RouterLink to="/items" class="btn float-end btn-success">Back</RouterLink>
+        <RouterLink to="/" class="btn float-end btn-success">Back</RouterLink>
       </h4>
     </div>
     <div class="card-body">
-      <div class="mb-3">
-        <label for="name">Name</label>
-        <input type="text" class="form-control" v-model="model.item.name"/>
+      <div v-for="(value, key) in model.item" :key="key" class="mb-3">
+        <label :for="key">{{ capitalize(key) }}</label>
+        <input
+            v-if="key !== 'checked'"
+            type="text"
+            class="form-control"
+            v-model="model.item[key]"
+        />
+        <input
+            v-else
+            type="checkbox"
+            class="form-check-input"
+            v-model="model.item.checked"
+        />
       </div>
-      <div class="mb-3">
-        <label for="description">Description</label>
-        <input type="text" class="form-control" v-model="model.item.description"/>
-      </div>
-      <div class="mb-3">
-        <label for="brand">Brand</label>
-        <input type="text" class="form-control" v-model="model.item.brand"/>
-      </div>
-      <div class="mb-3">
-        <label for="color">Color</label>
-        <input type="text" class="form-control" v-model="model.item.color"/>
-      </div>
-      <div class="mb-3">
-        <label for="checked">Checked</label>
-        <input type="text" class="form-control" v-model="model.item.checked"/>
-      </div>
-      <div class="mb-3">
-        <label for="availability">Availability</label>
-        <input type="text" class="form-control" v-model="model.item.availability"/>
-      </div>
-      <div class="mb-3">
-        <label for="price">Price</label>
-        <input type="text" class="form-control" v-model="model.item.price"/>
+      <div v-if="errorList" class="alert alert-danger" role="alert">
+        <p v-for="(errors, field) in errorList" :key="field">
+          <strong>{{ capitalize(field) }}:</strong>
+          <span v-for="error in errors" :key="error">{{ error }}</span>
+        </p>
       </div>
     </div>
     <div class="card-footer">
@@ -41,8 +34,10 @@
     </div>
   </div>
 </template>
+
 <script>
 import axios from "axios";
+import config from "../../config.js";
 
 export default {
   name: 'itemCreate',
@@ -63,29 +58,40 @@ export default {
     }
   },
   methods: {
+    capitalize(key) {
+      return key.charAt(0).toUpperCase() + key.slice(1);
+    },
     saveItem() {
-      var $this = this
-      axios.post("http://localhost:8001/api/items/create", this.model.item).then(res => {
-
-        console.log(res)
-        alert(res.data.message)
-
-        this.model.item = {
-          name: '',
-          description: '',
-          brand: '',
-          color: '',
-          checked: '',
-          price: '',
-          availability: '',
-        }
+      axios.post(`${config.apiBaseUrl}/items/create`, this.model.item, {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json;charset=UTF-8",
+        },
       })
-          .catch(function (error){
-            if (error.response.status === 422) {
-              $this.errorList = error.response.data.errors
-              //input validation error
-            }
+          .then(res => {
+            alert(res.data.message);
+            this.clearForm();
           })
+          .then(erro => {
+            console.log(erro)
+          })
+          .catch(error => {
+            if (error.response.status === 422) {
+              this.errorList = error.response.data.errors;
+              // input validation error
+            }
+          });
+    },
+    clearForm() {
+      this.model.item = {
+        name: '',
+        description: '',
+        brand: '',
+        color: '',
+        checked: '',
+        price: '',
+        availability: '',
+      };
     }
   }
 }

@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
 import IndexView from '../views/items/IndexView.vue'
 import CreateView from '../views/items/CreateView.vue'
 import EditView from '../views/items/EditView.vue'
@@ -9,11 +8,6 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      name: 'home',
-      component: HomeView
-    },
-    {
-      path: '/items',
       name: 'items',
       component: IndexView
     },

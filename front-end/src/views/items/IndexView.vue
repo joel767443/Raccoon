@@ -12,7 +12,7 @@
 
     <table class="table table-bordered table-hover">
       <thead>
-      <tr>vue plugin chrome
+      <tr>
         <th>ID</th>
         <th>Name</th>
         <th>Description</th>
@@ -47,6 +47,8 @@
 </template>
 <script>
 import axios from "axios";
+import config from "../../config.js";
+
 export default {
   name: 'items',
   data() {
@@ -59,18 +61,20 @@ export default {
   },
   methods: {
     getItems() {
-      axios.get('http://localhost:8001/api/items').then (res => {
+      axios.get(`${config.apiBaseUrl}/items`).then (res => {
         this.items = res.data.data
         console.log(res.data)
       });
     },
     deleteItem(itemId) {
-      const apiUrl = 'http://localhost:8001/api/items/' + itemId + '/delete';
+      const apiUrl = `${config.apiBaseUrl}/items/delete?id=`+ itemId;
 
       // Make a DELETE request using Axios
-      axios.delete(apiUrl)
+      axios.get(apiUrl)
           .then(response => {
+            alert(response.data.message)
             console.log('Item deleted successfully', response);
+            window.location.reload();
           })
           .catch(error => {
             // Handle error, e.g., show an error message

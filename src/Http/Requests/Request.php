@@ -44,8 +44,10 @@ class Request
         }
 
         if ($this->method() === 'post') {
-            foreach ($_POST as $key => $value) {
-                $body[$key] = filter_input(INPUT_POST, $key, FILTER_SANITIZE_SPECIAL_CHARS);
+            $postData = json_decode(file_get_contents('php://input'), true);
+            foreach ($postData as $key => $value) {
+                $key === 'checked' ? $value = (int)$value : $value;
+                $body[$key] = filter_var($value, FILTER_SANITIZE_SPECIAL_CHARS);
             }
         }
 
